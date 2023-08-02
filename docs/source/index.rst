@@ -19,7 +19,7 @@ These two situations are described by two principles that we can use to understa
 * the density principle: it asks whether a sample is similar to the training set
 * the local fit principle: it asks whether the model was well performing on cases similar to the new case to be classified
 
-Rel-AI implements these two principles and helps you understand the reliability of each single case you need to evaluate with your machine learning model
+Rel-AI implements these two principles and helps you understand the reliability of each single case's prediction you need to evaluate with your machine learning model
 
 Check out the :doc:`usage` section for further information, including
 how to :ref:`installation` the project.
