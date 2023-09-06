@@ -1,7 +1,7 @@
-Welcome to Rel-AI's documentation!
+Welcome to RelAI's documentation!
 ===================================
 
-**Rel-AI** is a Python library to compute pointwise reliability of Machine Learning predictions. 
+**RelAI** is a Python library to compute pointwise reliability of Machine Learning predictions. 
 
 
 
