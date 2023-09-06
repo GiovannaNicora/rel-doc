@@ -88,7 +88,7 @@ if needed, specify a more suitable architecture)
 
 .. code-block:: console
 
-   RD = get_reliability_detector(ae, syn_pts, acc_syn_pts, mse_thresh=mse_thresh, acc_thresh=acc_thresh, proxy_model="MLP")
+   RD = create_reliability_detector(ae, syn_pts, acc_syn_pts, mse_thresh=mse_thresh, acc_thresh=acc_thresh, proxy_model="MLP")
 
 9. It is now possible to compute the Reliability of the test_set
 
