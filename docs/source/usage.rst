@@ -30,7 +30,7 @@ Here's a simple example of usage of the ``RelAI`` with the ``breast_cancer`` dat
 
 .. code-block:: console 
 
-   from ReliabilityPackage.ReliabilityPackage import *
+   from ReliabilityPackage.ReliabilityFunctions import *
 
 
 2. Import all the other relevant packages
@@ -64,7 +64,7 @@ if needed, specify a more suitable architecture)
 
 .. code-block:: console
 
-      ae = get_train_autoencoder(X_train, X_val, batchsize=80, epochs=1000)
+      ae = get_and_train_autoencoder(X_train, X_val, batchsize=80, epochs=1000)
 
 6. Generate the dataset of the synthetic points and their associated values of accuracy
 
