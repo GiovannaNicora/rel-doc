@@ -64,7 +64,7 @@ if needed, specify a more suitable architecture)
 
 .. code-block:: console
 
-      ae = get_and_train_autoencoder(X_train, X_val, batchsize=80, epochs=1000)
+      ae = create_and_train_autoencoder(X_train, X_val, batchsize=80, epochs=1000)
 
 6. Generate the dataset of the synthetic points and their associated values of accuracy
 
