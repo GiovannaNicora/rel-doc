@@ -6,7 +6,7 @@ Usage
 Installation
 ------------
 
-To use Real-AI, first make sure you have the latest version of pip installed
+To use Rel-AI, first make sure you have the latest version of pip installed
 
 .. code-block:: console
 
