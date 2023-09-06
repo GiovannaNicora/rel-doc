@@ -16,12 +16,13 @@ Then install it using pip:
 
 .. code-block:: console
 
-   (.venv) $ pip install rel_ai
+   (.venv) $ python -m pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple ReliabilityPackage 
+
 
 Usage
 ----------------
 
-Here's a simple example of usage of the ``Rel-AI`` with the ``breast_cancer`` dataset of ``sklearn``.
+Here's a simple example of usage of the ``RelAI`` with the ``breast_cancer`` dataset of ``sklearn``.
 
 
 1. import the needed functions from the package
@@ -29,7 +30,7 @@ Here's a simple example of usage of the ``Rel-AI`` with the ``breast_cancer`` da
 
 .. code-block:: console 
 
-   from relai.relai import *
+   from ReliabilityPackage.ReliabilityPackage import *
 
 
 2. Import all the other relevant packages
