@@ -95,5 +95,5 @@ if needed, specify a more suitable architecture)
 .. code-block:: 
    
    test_reliability= compute_dataset_reliability(RD, X_test, mode='total')
-   reliable_test = X_test[np.where(reliability_test == 1)]
-   unreliable_test = X_test[np.where(reliability_test == 0)]
+   reliable_test = X_test[np.where(test_reliability == 1)]
+   unreliable_test = X_test[np.where(test_reliability == 0)]
