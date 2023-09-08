@@ -1,8 +1,15 @@
 [build-system]
-requires = ["flit_core >=3.2,<4"]
+requires = ["flit_core >=3.2,<4",
+            "setuptools>=42",
+            "wheel",
+            "numpy", 
+            "scikit-learn", 
+            "torch", 
+            "plotly", 
+            "matplotlib"]
 build-backend = "flit_core.buildapi"
 
 [project]
-name = "lumache"
-authors = [{name = "Graziella", email = "graziella@lumache"}]
+name = "relAI"
+authors = [{name = "Lorenzo", email = "lorenzo.peracchio01@universitadipavia.it"}]
 dynamic = ["version", "description"]
