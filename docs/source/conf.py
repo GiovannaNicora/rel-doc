@@ -35,7 +35,7 @@ html_theme = 'sphinx_rtd_theme'
 #     "logo_only": True,
 # }
 
-html_logo = 'logo_relAI.png'
+html_logo = 'logo_relAI_removebg.png'
 
 # -- Options for EPUB output
 epub_show_urls = 'footnote'
