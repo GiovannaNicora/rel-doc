@@ -30,7 +30,12 @@ templates_path = ['_templates']
 # -- Options for HTML output
 
 html_theme = 'sphinx_rtd_theme'
-html_logo = 'docs/source/logo_relAI.png'
+
+# html_theme_options = {
+#     "logo_only": True,
+# }
+
+html_logo = 'logo_relAI.png'
 
 # -- Options for EPUB output
 epub_show_urls = 'footnote'
