@@ -12,5 +12,10 @@ python:
     - method: pip
       path: .
 
+# Define the theme section and specify the logo URL
+theme:
+  logo:
+    url: docs/source/logo_relAI.png
+
 sphinx:
   fail_on_warning: false
