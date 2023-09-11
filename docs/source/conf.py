@@ -31,7 +31,7 @@ templates_path = ['_templates']
 
 html_theme = 'sphinx_rtd_theme'
 
-html_favicon = "logo_relAI_Mcs_icon.ico"
+html_favicon = "logo_relai_Qbt_icon.ico"
 
 html_logo = 'logo_relAI_removebg.png'
 
