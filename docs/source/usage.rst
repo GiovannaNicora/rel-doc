@@ -19,10 +19,10 @@ Then install it using pip:
    (.venv) $ python -m pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple ReliabilityPackage 
 
 
-Usage
+Usage - Classification Problem
 ----------------
 
-Here's a simple example of usage of the ``RelAI`` with the ``breast_cancer`` dataset of ``sklearn``.
+Here's a simple example of usage of ``RelAI`` for a typical classification problem, with the ``breast_cancer`` dataset of ``sklearn``.
 
 
 1. import the needed functions from the package
@@ -70,7 +70,7 @@ if needed, specify a more suitable architecture)
 
 .. code-block:: console
 
-      syn_pts, acc_syn_pts = generate_synthetic_points(clf.predict, X_train, y_train, method="GN", k = 5)
+      syn_pts, acc_syn_pts = generate_synthetic_points(problem_type = 'classification', predict_func=clf.predict, X_train=X_train, y_train=y_train, method='GN', k=5)
 
 7. Define a Mean Squared Error threshold and an Accuracy threshold
 (the ``mse_threshold_plot`` can be generated to see how the performances change based on percentiles of the MSE of the validation set)
@@ -84,11 +84,11 @@ if needed, specify a more suitable architecture)
    acc_thresh = 0.90
 
 
-8. Generate an instance of the ReliabilityDetector class
+8. Generate an instance of the ReliabilityDetector class for classification problems
 
 .. code-block:: console
 
-   RD = create_reliability_detector(ae, syn_pts, acc_syn_pts, mse_thresh=mse_thresh, acc_thresh=acc_thresh, proxy_model="MLP")
+   RD = create_reliability_detector('classification', ae, syn_pts, acc_syn_pts, mse_thresh=mse_thresh, perf_thresh=acc_thresh, proxy_model="MLP")
 
 9. It is now possible to compute the Reliability of the test_set
 
@@ -97,3 +97,77 @@ if needed, specify a more suitable architecture)
    test_reliability= compute_dataset_reliability(RD, X_test, mode='total')
    reliable_test = X_test[np.where(test_reliability == 1)]
    unreliable_test = X_test[np.where(test_reliability == 0)]
+
+Usage - Regression Problem
+----------------
+
+Here's a simple example of usage of ``RelAI`` for a regression problemgenerated through the ``make_regression`` function of ``sklearn``.
+
+
+1. import the needed functions from the package
+
+
+.. code-block:: console 
+
+   from ReliabilityPackage.ReliabilityFunctions import *
+
+
+2. Import all the other relevant packages
+
+.. code-block:: console 
+
+   import numpy as np
+   from sklearn.datasets import make_regression
+   from sklearn.model_selection import train_test_split
+   from sklearn.linear_model import LinearRegression
+
+3. Generate a random regression dataset and split it in a training, a validation, and a test set
+
+.. code-block:: console 
+
+   X, y = make_regression(n_samples=1000, n_features=20, noise=1, random_state=42)
+   X_seventy, X_test, y_seventy, y_test = train_test_split(X, y, test_size=0.30, random_state=42)
+   X_train, X_val, y_train, y_val = train_test_split(X_seventy, y_seventy, test_size=0.30, random_state=42)
+
+4. Train a linear regressor on the training set
+
+.. code-block:: console 
+
+   reg = LinearRegression().fit(X_train, y_train)
+
+5. Create and train an autoencoder for the implementation of the Density Principle
+(Please note that if the layer_sizes are not specified, the default autoencoder is built as follows: [dim_input, dim_input + 4, dim_input + 8, dim_input + 16, dim_input + 32];
+if needed, specify a more suitable architecture)
+
+.. code-block:: console
+
+      ae = create_and_train_autoencoder(X_train, X_val, batchsize=80, epochs=1000)
+
+6. Generate the dataset of the synthetic points and their associated values of Mean Squared Error
+
+.. code-block:: console
+
+      syn_pts, mse_syn_pts = generate_synthetic_points(problem_type = 'regression', predict_func=reg.predict, X_train=X_train, y_train=y_train, method='GN', k=5)
+
+7. Define a Mean Squared Error threshold for the Density Principle and a performance threshold for the Local Fit Principle (MSE as the performance metric for the Local Fit Principle)
+
+.. code-block:: console
+
+   mse_thresh = perc_mse_threshold(ae, X_val, perc=95)
+   performance_thresh = 0.8
+
+
+8. Generate an instance of the ReliabilityDetector class for regression problems
+
+.. code-block:: console
+
+   RD = create_reliability_detector('regression', ae, syn_pts, mse_syn_pts, mse_thresh=mse_thresh, perf_thresh=performance_thresh, proxy_model="MLP")
+
+9. It is now possible to compute the Reliability of the test_set
+
+.. code-block:: 
+   
+   test_reliability= compute_dataset_reliability(RD, X_test, mode='total')
+   reliable_test = X_test[np.where(test_reliability == 1)]
+   unreliable_test = X_test[np.where(test_reliability == 0)]
+
