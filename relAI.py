@@ -280,32 +280,36 @@ def _train_one_epoch(epoch_index, training_set, training_loader, optimizer, loss
     return last_loss
 
 
-def _compute_synpts_accuracy(predict_func, synpts, X_train, y_train, k=5):
+def _compute_synpts_perf(problem_type, predict_func, synpts, X_train, y_train, k=5):
     """
-    Computes the accuracy of the synthetic points with the classifer.
+    Computes the performances of the synthetic points with the classifer.
 
-    This function computes the accuracy on the set of synthetic points.
-    The accuracy of each synthetic points is computed by comparing the predicted labels of its k nearest
-    training samples to their actual labels.
+    This function computes the accuracy (classification problem) or the MSE (regression problem) on the set of synthetic points.
+    The accuracy/MSE of each synthetic points is computed by comparing the predicted labels/values of its k nearest
+    training samples to their actual labels/values.
 
+    :param str problem_type: The string indicating whether it is a classification or regression problem. Available options: 'classification', 'regression'
     :param callable predict_func: The predict function of the classifier.
     :param numpy.ndarray synpts: The synthetic points with shape (n_synpts, n_features).
     :param numpy.ndarray X_train: The training data with shape (n_samples, n_features).
     :param numpy.ndarray y_train: The training labels with shape (n_samples,).
     :param int k: The number of nearest neighbors to consider (default: 5).
 
-    :return: The accuracy scores associated with each synthetic point.
+    :return: The performance scores associated with each synthetic point.
     :rtype: numpy.ndarray
     """
-    acc_syn = []
+    perf_syn = []
 
     for i in range(len(synpts)):
         distances = np.linalg.norm(X_train - synpts[i], axis=1)
         nn = distances.argsort()[:k]
-        acc_syn.append(accuracy_score(predict_func(X_train[nn, :]), y_train[nn]))
-    acc_syn = np.asarray(acc_syn)
+        if problem_type == 'classification':
+            perf_syn.append(accuracy_score(predict_func(X_train[nn, :]), y_train[nn]))
+        elif problem_type == 'regression':
+            perf_syn.append(mean_squared_error(predict_func(X_train[nn, :]), y_train[nn]))
+    perf_syn = np.asarray(perf_syn)
 
-    return acc_syn
+    return perf_syn
 
 
 def _compute_metrics(y, ypred):
@@ -639,7 +643,7 @@ def compute_dataset_avg_mse(ae, X):
     return np.mean(mse)
 
 
-def generate_synthetic_points(predict_func, X_train, y_train, method='GN', k=5):
+def generate_synthetic_points(problem_type, predict_func, X_train, y_train, method='GN', k=5):
     """
     Generates synthetic points based on the specified method.
 
@@ -647,6 +651,7 @@ def generate_synthetic_points(predict_func, X_train, y_train, method='GN', k=5):
     'GN': the synthetic points are generated from the training set by adding gaussian random noise, with different
     values of variance, to the continous variables, and by randomly extracting, proportionally to their frequencies, the values of binary and integer variables.
 
+    :param str problem_type: The string indicating whether it is a classification or regression problem. Available options: 'classification', 'regression'
     :param callable predict_func: A callable predict function of a classifier.
     :param numpy.ndarray X_train: The training set with shape (n_samples, n_features).
     :param numpy.ndarray y_train: The training target labels.
@@ -655,7 +660,7 @@ def generate_synthetic_points(predict_func, X_train, y_train, method='GN', k=5):
 
     :return: A tuple containing two elements:
         - synthetic_data: The synthetic data points generated with the specified method.
-        - acc_syn: The associated accuracy of the synthetic data points evaluated with the provided predict_func.
+        - perf_syn: The associated performance values of the synthetic data points evaluated with the provided predict_func.
     :rtype: tuple
     """
     allowed_methods = ['GN']
@@ -675,9 +680,9 @@ def generate_synthetic_points(predict_func, X_train, y_train, method='GN', k=5):
 
             noisy_data = np.concatenate((noisy_data, noisy_data_temp))
 
-    acc_syn = _compute_synpts_accuracy(predict_func, noisy_data, X_train, y_train, k)
+    perf_syn = _compute_synpts_perf(problem_type, predict_func, noisy_data, X_train, y_train, k)
 
-    return noisy_data, acc_syn
+    return noisy_data, perf_syn
 
 
 def perc_mse_threshold(ae, validation_set, perc=95):
@@ -955,23 +960,24 @@ def density_predictor(ae, mse_thresh):
     return DP
 
 
-def create_reliability_detector(ae, syn_pts, acc_syn, mse_thresh, acc_thresh, proxy_model='MLP'):
+def create_reliability_detector(problem_type, ae, syn_pts, perf_syn, mse_thresh, perf_thresh, proxy_model='MLP'):
     """
     Creates a ReliabilityDetector object for a given autoencoder, synthetic points, accuracy of the synthetic points,
     MSE threshold, and accuracy threshold.
 
-    This function creates a ReliabilityDetector object using the specified autoencoder, synthetic points, accuracy of
-    the synthetic points, MSE threshold, and accuracy threshold. The ReliabilityDetector assigns the density
+    This function creates a ReliabilityDetector object using the specified autoencoder, synthetic points, performance values of
+    the synthetic points, MSE threshold, and performance threshold. The ReliabilityDetector assigns the density
     reliability of samples based on their reconstruction error (MSE), with respect to the MSE threshold, while it assigns
     the local fit reliability based on the prediction of a model ('proxy_model'), trained on the synthetic points
-    labelled as "local-fit" reliable/unreliable according to their associated accuracy with respect to the accuracy
+    labelled as "local-fit" reliable/unreliable according to their associated performance value with respect to the performance
     threshold.
 
+    :param str problem_type: The string indicating whether it is a classification or regression problem. Available options: 'classification', 'regression'
     :param AE ae: The autoencoder used for projection.
     :param array-like syn_pts: The synthetic points used for training the "local-fit" reliability predictor.
-    :param array-like acc_syn: The accuracy scores corresponding to the synthetic points.
+    :param array-like perf_syn: The performance scores corresponding to the synthetic points.
     :param float mse_thresh: The MSE threshold used for assigning the density reliability scores.
-    :param float acc_thresh: The accuracy threshold used for assigning the "local-fit" reliability scores.
+    :param float perf_thresh: The performance threshold used for assigning the "local-fit" reliability scores.
     :param str proxy_model: The type of proxy model used for training the "local-fit" reliability predictor.
         Available options: 'MLP', 'tree'. Default is 'MLP' (Multi-Layer Perceptron).
 
@@ -982,8 +988,11 @@ def create_reliability_detector(ae, syn_pts, acc_syn, mse_thresh, acc_thresh, pr
     if proxy_model not in allowed_proxy_model:
         raise ValueError(f"Invalid value for proxy_model. Allowed values are {allowed_proxy_model}.")
     y_syn_pts = []
-    for i in range(len(acc_syn)):
-        y_syn_pts.append(1) if acc_syn[i] >= acc_thresh else y_syn_pts.append(0)
+    for i in range(len(perf_syn)):
+        if problem_type == 'classification':
+            y_syn_pts.append(1) if perf_syn[i] >= perf_thresh else y_syn_pts.append(0)
+        elif problem_type == 'regression':
+            y_syn_pts.append(1) if perf_syn[i] <= perf_thresh else y_syn_pts.append(0)
 
     if proxy_model == 'MLP':
         clf = MLPClassifier(activation="tanh", random_state=42, max_iter=1000).fit(syn_pts, y_syn_pts)
