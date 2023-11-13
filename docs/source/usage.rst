@@ -101,7 +101,7 @@ if needed, specify a more suitable architecture)
 Usage - Regression Problem
 ----------------
 
-Here's a simple example of usage of ``RelAI`` for a regression problemgenerated through the ``make_regression`` function of ``sklearn``.
+Here's a simple example of usage of ``RelAI`` for a regression problem generated through the ``make_regression`` function of ``sklearn``.
 
 
 1. import the needed functions from the package
