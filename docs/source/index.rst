@@ -1,9 +1,7 @@
 Welcome to RelAI's documentation!
 ===================================
 
-**RelAI** is a Python library to compute pointwise reliability of Machine Learning predictions. 
-
-
+**RelAI** is a Python library to compute the pointwise reliability of Machine Learning predictions, as implemented in Peracchio L et al. "Evaluation of Predictive Reliability to Foster Trust in Artificial Intelligence. A case study in Multiple Sclerosis" 2024. http://arxiv.org/abs/2402.17554.  
 
  
 .. image:: workflow-rel-ai.png
